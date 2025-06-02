@@ -58,4 +58,3 @@ jobs:
           artifacts: "**/exe/*.exe,**/deb/*.deb,**/rpm/*.rpm,**/dmg/*.dmg"
           tag: ${{needs.current-time.outputs.currentTime}}
           name: ${{needs.current-time.outputs.currentTime}}
-          token: ${{secrets.ACTION_TOKEN}}
