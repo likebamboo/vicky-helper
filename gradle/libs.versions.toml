@@ -1,0 +1,67 @@
+[versions]
+agp = "8.7.0"
+android-compileSdk = "35"
+android-minSdk = "27"
+android-targetSdk = "35"
+androidx-activityCompose = "1.9.3"
+androidx-appcompat = "1.7.0"
+androidx-constraintlayout = "2.2.0"
+androidx-core-ktx = "1.15.0"
+androidx-espresso-core = "3.6.1"
+androidx-lifecycle = "2.8.4"
+androidx-material = "1.12.0"
+androidx-test-junit = "1.2.1"
+compose-multiplatform = "1.7.1"
+kotlin = "2.1.0"
+kotlinx-coroutines = "1.9.0"
+# 文件选择
+filekit = "0.8.8"
+# 图形
+graphics-core = "1.0.3"
+graphics-path = "1.0.1"
+graphics-shapes = "1.0.1"
+# json
+kotlinx-serialization-plugin = "2.1.20"
+kotlinx-serialization-json = "1.8.0"
+# koin
+koin = "4.0.4"
+
+# excel处理
+poi= "5.2.3"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
+androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
+androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
+androidx-graphics-core = { module = "androidx.graphics:graphics-core", version.ref = "graphics-core" }
+androidx-graphics-path = { module = "androidx.graphics:graphics-path", version.ref = "graphics-path" }
+androidx-graphics-shapes = { module = "androidx.graphics:graphics-shapes", version.ref = "graphics-shapes" }
+androidx-graphics-shapes-android = { module = "androidx.graphics:graphics-shapes-android", version.ref = "graphics-shapes" }
+androidx-graphics-shapes-desktop = { module = "androidx.graphics:graphics-shapes-desktop", version.ref = "graphics-shapes" }
+androidx-graphics-shapes-iosarm64 = { module = "androidx.graphics:graphics-shapes-iosarm64", version.ref = "graphics-shapes" }
+androidx-graphics-shapes-iossimulatorarm64 = { module = "androidx.graphics:graphics-shapes-iossimulatorarm64", version.ref = "graphics-shapes" }
+androidx-graphics-shapes-iosx64 = { module = "androidx.graphics:graphics-shapes-iosx64", version.ref = "graphics-shapes" }
+kotlinx-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+poi = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinx-serialization-plugin" }
