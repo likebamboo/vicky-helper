@@ -61,7 +61,7 @@ jobs:
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "zip"
-          directory: ".\build\compose\binaries\main-release\exe\vicky"
+          directory: "./build/compose/binaries/main-release/exe/vicky"
           filename: "vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.zip"
 
       - name: create a release
