@@ -54,14 +54,14 @@ jobs:
           echo "First command"
           echo "Current directory:"
           echo (Get-Location).Path
-          mv ./desktopApp/build/compose/binaries/main-release/exe/vicky-${{env.PACKAGE_VERSION}}.exe ./build/compose/binaries/main-release/exe/vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.exe
+          mv .\desktopApp\build\compose\binaries\main-release\exe\vicky-${{env.PACKAGE_VERSION}}.exe .\build\compose\binaries\main-release\exe\vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.exe
 
       - if: matrix.os == 'windows-latest'
         name: zip AppImage
         uses: thedoctor0/zip-release@0.7.6
         with:
           type: "zip"
-          directory: "./build/compose/binaries/main-release/app/vicky"
+          directory: ".\build\compose\binaries\main-release\exe\vicky"
           filename: "vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.zip"
 
       - name: create a release
