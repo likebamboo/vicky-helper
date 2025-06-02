@@ -52,9 +52,9 @@ jobs:
         name: rename File
         run: |
           echo "First command"
-          pwd
-          ls -la
-          mv ./desktopApp/build/compose/binaries/main-release/msi/vicky-${{env.PACKAGE_VERSION}}.msi ./build/compose/binaries/main-release/msi/vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.msi
+          Get-Location
+          Get-ChildItem -Force
+          mv ./desktopApp/build/compose/binaries/main-release/exe/vicky-${{env.PACKAGE_VERSION}}.exe ./build/compose/binaries/main-release/exe/vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.exe
 
       - if: matrix.os == 'windows-latest'
         name: zip AppImage
@@ -71,7 +71,7 @@ jobs:
           generateReleaseNotes: false
           artifactErrorsFailBuild: false
           body: "create by workflows"
-          artifacts: "**/msi/*.msi,**/app/vicky/*.zip,**/deb/*.deb,**/rpm/*.rpm,**/dmg/*.dmg"
+          artifacts: "**/exe/*.exe,**/app/vicky/*.zip,**/deb/*.deb,**/rpm/*.rpm,**/dmg/*.dmg"
           tag: ${{needs.current-time.outputs.currentTime}}
           name: ${{needs.current-time.outputs.currentTime}}
           token: ${{secrets.ACTION_TOKEN}}
