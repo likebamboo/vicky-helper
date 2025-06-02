@@ -54,8 +54,14 @@ jobs:
           echo "First command"
           echo "Current directory:"
           echo (Get-Location).Path
-          mv .\desktopApp\build\compose\binaries\main-release\exe\vicky-${{env.PACKAGE_VERSION}}.exe .\build\compose\binaries\main-release\exe\vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.exe
-
+          $source = "desktopApp\build\compose\binaries\main-release\exe\vicky-1.0.0.exe"
+          $target = "build\compose\binaries\main-release\exe\vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.exe"
+          if (Test-Path $source) {
+            Move-Item $source $target
+          } else {
+            Write-Error "File not found: $source"
+          }
+          
       - if: matrix.os == 'windows-latest'
         name: zip AppImage
         uses: thedoctor0/zip-release@0.7.6
