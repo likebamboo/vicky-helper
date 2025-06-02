@@ -52,8 +52,8 @@ jobs:
         name: rename File
         run: |
           echo "First command"
-          Get-Location
-          Get-ChildItem -Force
+          echo "Current directory:"
+          echo (Get-Location).Path
           mv ./desktopApp/build/compose/binaries/main-release/exe/vicky-${{env.PACKAGE_VERSION}}.exe ./build/compose/binaries/main-release/exe/vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.exe
 
       - if: matrix.os == 'windows-latest'
