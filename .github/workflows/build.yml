@@ -1,0 +1,74 @@
+name: create release
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  PACKAGE_VERSION: 1.0.0
+  V_PACKAGE_VERSION: v1.0.0
+
+jobs:
+
+  current-time:
+    runs-on: ubuntu-latest
+    name: get current time
+    outputs:
+      currentTime: ${{steps.currentTime.outputs.formattedTime}}
+    steps:
+      - id: currentTime
+        uses: josStorer/get-current-time@v2
+        with:
+          format: YYYY.MM.DD
+          utcOffset: "+08:00"
+
+  create-release-distribution:
+    strategy:
+      matrix:
+        os: [ windows-latest ]
+    runs-on: ${{ matrix.os }}
+    name: create release distribution
+    needs: current-time
+
+    steps:
+      - if: matrix.os != 'macos-14'
+        name: setup jdk
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "18"
+          architecture: x64
+
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: packageReleaseDistributionForCurrentOS
+        run: ./gradlew clean packageReleaseDistributionForCurrentOS
+
+      - if: matrix.os == 'windows-latest'
+        name: rename File
+        run: |
+          mv ./desktopApp/build/compose/binaries/main-release/exe/vicky-${{env.PACKAGE_VERSION}}.exe ./build/compose/binaries/main-release/exe/vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.exe
+
+      - if: matrix.os == 'windows-latest'
+        name: zip AppImage
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          type: "zip"
+          directory: "./build/compose/binaries/main-release/app/vicky"
+          filename: "vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.zip"
+
+      - name: create a release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          generateReleaseNotes: false
+          artifactErrorsFailBuild: false
+          body: "create by workflows"
+          artifacts: "**/exe/*.exe,**/app/vicky/*.zip,**/deb/*.deb,**/rpm/*.rpm,**/dmg/*.dmg"
+          tag: ${{needs.current-time.outputs.currentTime}}
+          name: ${{needs.current-time.outputs.currentTime}}
+          token: ${{secrets.ACTION_TOKEN}}

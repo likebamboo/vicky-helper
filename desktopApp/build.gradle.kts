@@ -29,15 +29,27 @@ compose.desktop {
             macOS {
                 iconFile.set(iconsRoot.resolve("icon-mac.icns"))
                 bundleID = "com.likebamboo.vicky"
+                setDockNameSameAsPackageName = true
+                appStore = true
             }
             windows {
                 iconFile.set(iconsRoot.resolve("icon-windows.ico"))
-//                menuGroup = "Compose Examples"
+                menuGroup = packageName
 //                // see https://wixtoolset.org/documentation/manual/v3/howtos/general/generate_guids.html
-//                upgradeUuid = "18159995-d967-4CD2-8885-77BFA97CFA9F"
+                upgradeUuid = "5217305f-f0cc-488b-9e29-0e47c0922761"
             }
             linux {
                 iconFile.set(iconsRoot.resolve("icon-linux.png"))
+            }
+        }
+
+        buildTypes.release {
+            proguard {
+                isEnabled.set(false)
+                obfuscate.set(false)
+                optimize.set(false)
+                joinOutputJars.set(false)
+                configurationFiles.from("proguard-rules.pro")
             }
         }
     }
