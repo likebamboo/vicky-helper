@@ -51,6 +51,9 @@ jobs:
       - if: matrix.os == 'windows-latest'
         name: rename File
         run: |
+          echo "First command"
+          pwd
+          ls -la
           mv ./desktopApp/build/compose/binaries/main-release/msi/vicky-${{env.PACKAGE_VERSION}}.msi ./build/compose/binaries/main-release/msi/vicky-${{env.V_PACKAGE_VERSION}}-windows-x86_64.msi
 
       - if: matrix.os == 'windows-latest'
