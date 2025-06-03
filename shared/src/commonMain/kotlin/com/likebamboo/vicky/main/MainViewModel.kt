@@ -148,7 +148,7 @@ class MainViewModel : ViewModel() {
                 KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_8,
                 KEY_9, KEY_10, KEY_11, KEY_12, KEY_13, KEY_14, KEY_15,
                 KEY_16, KEY_17, KEY_18, KEY_19, KEY_20, KEY_21, KEY_22,
-                KEY_23, KEY_24, KEY_25,
+                KEY_23, KEY_24, KEY_25, KEY_26,
                 // 新增的列
                 KEY_100, KEY_101, KEY_102, KEY_103, KEY_104, KEY_105,
                 KEY_106, KEY_107
@@ -158,7 +158,7 @@ class MainViewModel : ViewModel() {
                 KEY_6, KEY_8,
                 KEY_9, KEY_10, KEY_11, KEY_12, KEY_13, KEY_14, KEY_15,
                 KEY_16, KEY_17, KEY_18, KEY_19, KEY_20, KEY_21, KEY_22,
-                KEY_23, KEY_24, KEY_25,
+                KEY_23, KEY_24, KEY_25, KEY_26,
                 // 新增的列
                 KEY_100, KEY_101, KEY_102, KEY_103, KEY_104, KEY_105,
                 KEY_106, KEY_107
@@ -303,13 +303,14 @@ class MainViewModel : ViewModel() {
                     var sumOrders = 0
                     // 总点击
                     var sumClick = 0
+                    // 总销售额
+                    var sumSaleMoneys = 0.0f
+                    // 总销量
+                    var sumSaleCounts = 0
+
                     // 输出数据
                     val outputDatas = mutableListOf<RowData>()
 
-                    // 该活动的产品单价
-                    var price = properties.find {
-                        it.activity == activity
-                    }?.price ?: 0.0f
                     // 该活动产品基础竞价
                     var bid = properties.find {
                         it.activity == activity
@@ -326,17 +327,29 @@ class MainViewModel : ViewModel() {
                         val keywordClick = d.cells[KEY_11]?.toFloatOrNull()?.toInt() ?: 0
                         sumClick += keywordClick
 
-                        val cells = d.cells
-
-                        // todo price 可能为0
-                        if (price == 0.0f) {
-                            val sellsAmount = d.cells[KEY_15]?.toFloatOrNull() ?: 0.0f
-                            price = if (keywordOrder > 0) sellsAmount / keywordOrder else 0.0f
-                        }
+                        val saleMoney = d.cells[KEY_15]?.toFloatOrNull() ?: 0.0f
+                        sumSaleMoneys += saleMoney
+                        val saleCount = d.cells[KEY_26]?.toFloatOrNull()?.toInt() ?: 0
+                        sumSaleCounts += saleCount
                         // todo 基础竞价
                         if (bid == 0f) {
                             bid = d.cells[KEY_8]?.toFloatOrNull() ?: 0f
                         }
+                    }
+
+                    // 价格
+                    val price = if (sumSaleCounts > 0) {
+                        sumSaleMoneys / sumSaleCounts
+                    } else {
+                        0.0f
+                    }
+                    // 真实acos
+                    datas.forEach { d ->
+                        // 当前关键词的广告花费
+                        val keywordCost = d.cells[KEY_14]?.toFloatOrNull() ?: 0.0f
+                        // 当前关键词的订单数
+                        val keywordOrder = d.cells[KEY_20]?.toFloatOrNull()?.toInt() ?: 0
+                        val cells = d.cells
 
                         // 计算真实acos
                         val realAcos = if (price > 0 && keywordOrder > 0) {

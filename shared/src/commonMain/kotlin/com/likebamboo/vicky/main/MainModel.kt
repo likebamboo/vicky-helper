@@ -27,7 +27,7 @@ internal const val KEY_22: String = "间接成交订单"
 internal const val KEY_23: String = "间接订单占比"
 internal const val KEY_24: String = "CPA-本币"
 internal const val KEY_25: String = "CVR"
-// internal const val KEY_26: String = "计算逻辑"
+internal const val KEY_26: String = "广告销量"
 
 
 internal const val KEY_100: String = "目标竞价"
