@@ -439,7 +439,7 @@ class MainViewModel : ViewModel() {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.01f)
                                 }
 
-                                baseBid >= 0.6f && baseBid < 1.2f -> {
+                                baseBid > 0.5f && baseBid < 1.2f -> {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.02f)
                                 }
 
@@ -469,7 +469,7 @@ class MainViewModel : ViewModel() {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.01f)
                                 }
 
-                                baseBid >= 0.6f && baseBid < 1.2f -> {
+                                baseBid > 0.5f && baseBid < 1.2f -> {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.02f)
                                 }
 
