@@ -414,9 +414,21 @@ class MainViewModel : ViewModel() {
 
                 // 处理分组数据
                 outputGroups.forEach { activity, datas ->
-
-                    val outputDatas = datas.toMutableList()
-                    datas.forEachIndexed { index, data ->
+                    val outdatas = datas.filter {
+                        // 过滤掉花费等于0的数据，汇总数据要保留
+                        val notEmpty =
+                            !it.cells[KEY_14].isNullOrEmpty() && (it.cells[KEY_14]?.toFloatOrNull() ?: 0f) > 0f
+                        notEmpty || it.cells[KEY_1]?.startsWith("汇总") == true
+                    }.sortedBy {
+                        if (it.cells[KEY_1]?.startsWith("汇总") == true) {
+                            // 汇总行放在最后
+                            Float.MAX_VALUE
+                        } else {
+                            // 按花费排序
+                            it.cells[KEY_14]?.toFloatOrNull() ?: 0f
+                        }
+                    }
+                    outdatas.forEachIndexed { index, data ->
                         if (data.cells[KEY_1]?.startsWith("汇总") == true) {
                             return@forEachIndexed
                         }
@@ -483,8 +495,7 @@ class MainViewModel : ViewModel() {
                             }
                         }
                     }
-
-                    outputGroups[activity] = outputDatas
+                    outputGroups[activity] = outdatas
                 }
 
                 return@withContext outputGroups
