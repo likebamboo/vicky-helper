@@ -23,7 +23,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Deb)
             packageName = "vicky"
-            packageVersion = "1.0.0"
+            packageVersion = project.property("VERSION_NAME")?.toString() ?: "1.0.0"
 
             val iconsRoot = project.file("desktop-icons")
             macOS {
