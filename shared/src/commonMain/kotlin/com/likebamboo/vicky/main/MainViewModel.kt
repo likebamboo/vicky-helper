@@ -419,10 +419,10 @@ class MainViewModel : ViewModel() {
                         val notEmpty =
                             !it.cells[KEY_14].isNullOrEmpty() && (it.cells[KEY_14]?.toFloatOrNull() ?: 0f) > 0f
                         notEmpty || it.cells[KEY_1]?.startsWith("汇总") == true
-                    }.sortedBy {
+                    }.sortedByDescending {
                         if (it.cells[KEY_1]?.startsWith("汇总") == true) {
                             // 汇总行放在最后
-                            Float.MAX_VALUE
+                            -1f
                         } else {
                             // 按花费排序
                             it.cells[KEY_14]?.toFloatOrNull() ?: 0f
