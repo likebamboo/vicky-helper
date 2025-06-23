@@ -16,6 +16,9 @@ import java.nio.file.Paths
 import kotlin.math.roundToInt
 
 
+private val NO_BASE_BID = "找不到竞价" to 0f
+private val NO_AD_ACTIVITY = "找不到广告活动" to -1f
+
 class MainViewModel : ViewModel() {
     companion object {
         private val CONFIG_FILE_PATH: String
@@ -195,7 +198,11 @@ class MainViewModel : ViewModel() {
                             } else {
                                 str?.toFloatOrNull() ?: 0f
                             }
-                            item.add(number)
+                            when {
+                                str?.contains(NO_BASE_BID.first) == true -> item.add(str)
+                                str?.contains(NO_AD_ACTIVITY.first) == true -> item.add(str)
+                                else -> item.add(number)
+                            }
                         } else {
                             item.add(str ?: "")
                         }
@@ -312,9 +319,10 @@ class MainViewModel : ViewModel() {
                     val outputDatas = mutableListOf<RowData>()
 
                     // 该活动产品基础竞价
-                    var bid = properties.find {
+                    val property = properties.find {
                         it.activity == activity
-                    }?.baseBid ?: 0.0f
+                    }
+                    val bid = property?.baseBid ?: NO_AD_ACTIVITY.second
                     // 真实acos
                     datas.forEach { d ->
                         // 当前关键词的广告花费
@@ -331,10 +339,6 @@ class MainViewModel : ViewModel() {
                         sumSaleMoneys += saleMoney
                         val saleCount = d.cells[KEY_26]?.toFloatOrNull()?.toInt() ?: 0
                         sumSaleCounts += saleCount
-                        // todo 基础竞价
-                        if (bid == 0f) {
-                            bid = d.cells[KEY_8]?.toFloatOrNull() ?: 0f
-                        }
                     }
 
                     // 价格
@@ -358,7 +362,11 @@ class MainViewModel : ViewModel() {
                             0.0f
                         }
                         cells[KEY_101] = String.format("%.2f", realAcos * 100) + "%"
-                        cells[KEY_106] = String.format("%.2f", bid)
+                        cells[KEY_106] = when {
+                            NO_BASE_BID.second == bid -> NO_BASE_BID.first
+                            NO_AD_ACTIVITY.second == bid -> NO_AD_ACTIVITY.first
+                            else -> String.format("%.2f", bid)
+                        }
                         cells[KEY_107] = String.format("%.2f", price)
                         // 添加到输出数据
                         outputDatas.add(RowData(cells))
@@ -432,6 +440,11 @@ class MainViewModel : ViewModel() {
                         if (data.cells[KEY_1]?.startsWith("汇总") == true) {
                             return@forEachIndexed
                         }
+                        val baseBid = when {
+                            data.cells[KEY_106] == NO_AD_ACTIVITY.first -> NO_AD_ACTIVITY.second
+                            data.cells[KEY_106] == NO_BASE_BID.first -> NO_BASE_BID.second
+                            else -> data.cells[KEY_106]?.toFloatOrNull() ?: 0f
+                        }
                         val click = data.cells[KEY_11]?.toFloatOrNull()?.toInt() ?: 0
                         if (click >= 20) {
                             // 1，以ACOS作为计算依据，先算出某一个广告活动的平均ACOS（广告费/广告的订单销售额）=总广告费/(总广告订单*产品单价）
@@ -441,12 +454,13 @@ class MainViewModel : ViewModel() {
                             // 5，如果大于平均ACOS，则每大3%算一个阶梯，在基础竞价上减价
                             val realAcos = data.cells[KEY_101]?.removeSuffix("%")?.toFloatOrNull() ?: 0f
                             val avgAcos = data.cells[KEY_105]?.removeSuffix("%")?.toFloatOrNull() ?: 0f
-                            val baseBid = data.cells[KEY_106]?.toFloatOrNull() ?: 0f
 
                             val diff = realAcos - avgAcos
                             // 有多少个 3% 的
                             val steps = (diff / 3f).roundToInt()
                             when {
+                                baseBid == NO_AD_ACTIVITY.second -> data.cells[KEY_100] = NO_AD_ACTIVITY.first
+                                baseBid == NO_BASE_BID.second -> data.cells[KEY_100] = NO_BASE_BID.first
                                 baseBid <= 0.5f -> {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.01f)
                                 }
@@ -472,11 +486,12 @@ class MainViewModel : ViewModel() {
                             val realClick = data.cells[KEY_11]?.toFloatOrNull()?.toInt() ?: 0
                             val baseClick = data.cells[KEY_102]?.toFloatOrNull() ?: 0f
                             val targetClick = (data.cells[KEY_20]?.toFloatOrNull()?.toInt() ?: 0) * baseClick
-                            val baseBid = data.cells[KEY_106]?.toFloatOrNull() ?: 0f
 
                             // 有多少个 3% 的
                             val steps = ((realClick - targetClick) / 3f).roundToInt()
                             when {
+                                baseBid == NO_AD_ACTIVITY.second -> data.cells[KEY_100] = NO_AD_ACTIVITY.first
+                                baseBid == NO_BASE_BID.second -> data.cells[KEY_100] = NO_BASE_BID.first
                                 baseBid <= 0.5f -> {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.01f)
                                 }
