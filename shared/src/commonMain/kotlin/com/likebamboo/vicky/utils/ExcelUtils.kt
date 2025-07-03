@@ -68,7 +68,7 @@ object ExcelUtils {
         workbook: XSSFWorkbook,
         data: Array<Any?>,
         sheetName: String? = null,
-        styleProvider: ((Int)-> XSSFCellStyle?)? = null
+        styleProvider: ((Int, XSSFCell, Number)-> XSSFCellStyle?)? = null
     ) {
         val sheetCount = workbook.numberOfSheets
         if (sheetCount <= 0) {
@@ -96,8 +96,9 @@ object ExcelUtils {
                 val cell = row.createCell(i)
                 if (data[i] is Number) {
                     cell.cellType = CellType.NUMERIC
-                    cell.setCellValue((data[i] as Number).toDouble())
-                    val style = styleProvider?.invoke(i)
+                    val value = (data[i] as Number).toDouble()
+                    cell.setCellValue(value)
+                    val style = styleProvider?.invoke(i, cell, value)
                     if (style != null) {
                         cell.cellStyle = style
                     }

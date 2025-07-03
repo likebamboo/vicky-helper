@@ -10,14 +10,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.IndexedColors
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.math.roundToInt
 
+/**
+ * 没有基础竞价
+ */
+private const val NO_BASE_BID = -9999f
 
-private val NO_BASE_BID = "找不到竞价" to 0f
-private val NO_AD_ACTIVITY = "找不到广告活动" to -1f
+/**
+ * 没有对应的活动
+ */
+private const val NO_AD_ACTIVITY = -99999f
 
 class MainViewModel : ViewModel() {
     companion object {
@@ -181,6 +189,20 @@ class MainViewModel : ViewModel() {
             // 设置为保留两位小数
             decimalStyle.dataFormat = workbook.createDataFormat().getFormat("0.00")
 
+            // 创建一个数字样式 + 红色背景
+            val decimalRedStyle = workbook.createCellStyle()
+            decimalRedStyle.dataFormat = workbook.createDataFormat().getFormat("0.00")
+            // 设置红色背景
+            decimalRedStyle.setFillForegroundColor(IndexedColors.RED.getIndex())
+            decimalRedStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND)
+
+            // 创建一个数字样式 + 红色背景
+            val decimalDarkRedStyle = workbook.createCellStyle()
+            decimalDarkRedStyle.dataFormat = workbook.createDataFormat().getFormat("0.00")
+            // 设置红色背景
+            decimalDarkRedStyle.setFillForegroundColor(IndexedColors.DARK_RED.getIndex())
+            decimalDarkRedStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND)
+
             // 创建百分比样式，保留两位小数
             val percentStyle = workbook.createCellStyle()
             percentStyle.dataFormat = workbook.createDataFormat().getFormat("0.00%")
@@ -198,11 +220,7 @@ class MainViewModel : ViewModel() {
                             } else {
                                 str?.toFloatOrNull() ?: 0f
                             }
-                            when {
-                                str?.contains(NO_BASE_BID.first) == true -> item.add(str)
-                                str?.contains(NO_AD_ACTIVITY.first) == true -> item.add(str)
-                                else -> item.add(number)
-                            }
+                            item.add(number)
                         } else {
                             item.add(str ?: "")
                         }
@@ -213,11 +231,21 @@ class MainViewModel : ViewModel() {
                     } else {
                         ExcelUtils.insertRow(
                             workbook, item.toTypedArray(), sheet.sheetName,
-                            styleProvider = { idx ->
+                            styleProvider = { idx, cell, value ->
                                 if (percentColsIdx.contains(idx)) {
                                     percentStyle
                                 } else {
-                                    decimalStyle
+                                    when (value.toFloat()) {
+                                        NO_BASE_BID -> {
+                                            cell.setBlank()
+                                            decimalDarkRedStyle
+                                        }
+                                        NO_AD_ACTIVITY -> {
+                                            cell.setBlank()
+                                            decimalRedStyle
+                                        }
+                                        else -> decimalStyle
+                                    }
                                 }
                             }
                         )
@@ -242,7 +270,9 @@ class MainViewModel : ViewModel() {
                         row.forEachIndexed { index, cell ->
                             val item = Property(
                                 activity = row.getCell(0)?.toString() ?: "",
-                                baseBid = row.getCell(1)?.numericCellValue?.toFloat() ?: 0f,
+                                baseBid = if (row.getCell(1)?.numericCellValue?.toFloat() == 0f) {
+                                    NO_BASE_BID
+                                } else row.getCell(1)?.numericCellValue?.toFloat() ?: NO_BASE_BID,
                                 price = row.getCell(2)?.numericCellValue?.toFloat() ?: 0f
                             )
                             properties.add(item)
@@ -322,7 +352,7 @@ class MainViewModel : ViewModel() {
                     val property = properties.find {
                         it.activity == activity
                     }
-                    val bid = property?.baseBid ?: NO_AD_ACTIVITY.second
+                    val bid = property?.baseBid ?: NO_AD_ACTIVITY
                     // 真实acos
                     datas.forEach { d ->
                         // 当前关键词的广告花费
@@ -362,9 +392,9 @@ class MainViewModel : ViewModel() {
                             0.0f
                         }
                         cells[KEY_101] = String.format("%.2f", realAcos * 100) + "%"
-                        cells[KEY_106] = when {
-                            NO_BASE_BID.second == bid -> NO_BASE_BID.first
-                            NO_AD_ACTIVITY.second == bid -> NO_AD_ACTIVITY.first
+                        cells[KEY_106] = when (bid) {
+                            NO_BASE_BID -> NO_BASE_BID.toString()
+                            NO_AD_ACTIVITY -> NO_AD_ACTIVITY.toString()
                             else -> String.format("%.2f", bid)
                         }
                         cells[KEY_107] = String.format("%.2f", price)
@@ -441,8 +471,8 @@ class MainViewModel : ViewModel() {
                             return@forEachIndexed
                         }
                         val baseBid = when {
-                            data.cells[KEY_106] == NO_AD_ACTIVITY.first -> NO_AD_ACTIVITY.second
-                            data.cells[KEY_106] == NO_BASE_BID.first -> NO_BASE_BID.second
+                            data.cells[KEY_106] == NO_AD_ACTIVITY.toString() -> NO_AD_ACTIVITY
+                            data.cells[KEY_106] == NO_BASE_BID.toString() -> NO_BASE_BID
                             else -> data.cells[KEY_106]?.toFloatOrNull() ?: 0f
                         }
                         val click = data.cells[KEY_11]?.toFloatOrNull()?.toInt() ?: 0
@@ -459,8 +489,8 @@ class MainViewModel : ViewModel() {
                             // 有多少个 3% 的
                             val steps = (diff / 3f).roundToInt()
                             when {
-                                baseBid == NO_AD_ACTIVITY.second -> data.cells[KEY_100] = NO_AD_ACTIVITY.first
-                                baseBid == NO_BASE_BID.second -> data.cells[KEY_100] = NO_BASE_BID.first
+                                baseBid == NO_AD_ACTIVITY -> data.cells[KEY_100] = NO_AD_ACTIVITY.toString()
+                                baseBid == NO_BASE_BID -> data.cells[KEY_100] = NO_BASE_BID.toString()
                                 baseBid <= 0.5f -> {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.01f)
                                 }
@@ -490,8 +520,8 @@ class MainViewModel : ViewModel() {
                             // 有多少个 3% 的
                             val steps = ((realClick - targetClick) / 3f).roundToInt()
                             when {
-                                baseBid == NO_AD_ACTIVITY.second -> data.cells[KEY_100] = NO_AD_ACTIVITY.first
-                                baseBid == NO_BASE_BID.second -> data.cells[KEY_100] = NO_BASE_BID.first
+                                baseBid == NO_AD_ACTIVITY -> data.cells[KEY_100] = NO_AD_ACTIVITY.toString()
+                                baseBid == NO_BASE_BID -> data.cells[KEY_100] = NO_BASE_BID.toString()
                                 baseBid <= 0.5f -> {
                                     data.cells[KEY_100] = String.format("%.2f", baseBid - steps * 0.01f)
                                 }
