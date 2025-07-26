@@ -161,8 +161,8 @@ class MainViewModel : ViewModel() {
                 KEY_16, KEY_17, KEY_18, KEY_19, KEY_20, KEY_21, KEY_22,
                 KEY_23, KEY_24, KEY_25, KEY_26,
                 // 新增的列
-                KEY_100, KEY_101, KEY_102, KEY_103, KEY_104, KEY_105,
-                KEY_106, KEY_107
+                KEY_100, KEY_106, KEY_101, KEY_102, KEY_103, KEY_104, KEY_105,
+                KEY_107
             )
             // 用数字表示的列（包括用数字表示的列）
             val numberCols = listOf(
@@ -171,8 +171,8 @@ class MainViewModel : ViewModel() {
                 KEY_16, KEY_17, KEY_18, KEY_19, KEY_20, KEY_21, KEY_22,
                 KEY_23, KEY_24, KEY_25, KEY_26,
                 // 新增的列
-                KEY_100, KEY_101, KEY_102, KEY_103, KEY_104, KEY_105,
-                KEY_106, KEY_107
+                KEY_100, KEY_106, KEY_101, KEY_102, KEY_103, KEY_104, KEY_105,
+                KEY_107
             )
             // 用百分比表示的列
             val percentColsIdx = mutableListOf<Int>()
@@ -318,7 +318,11 @@ class MainViewModel : ViewModel() {
                         }
                         continue
                     }
-
+                    // 如果是没有启用的广告活动，则跳过
+                    val enableIndex = header.indexOf(KEY_5)
+                    if (enableIndex < 0 || row.getCell(enableIndex)?.toString()?.trim() != "enabled") {
+                        continue
+                    }
                     rowData.add(RowData().apply {
                         // 读取数据行
                         for (j in 0 until cellNum) {
